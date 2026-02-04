@@ -1,0 +1,8 @@
+
+path: c:/Tennis Analysis/training/tennis_yolo_final
+train: images/train
+val: images/val
+test: images/test
+
+nc: 1
+names: ['tennis_ball']

@@ -1,0 +1,11 @@
+
+path: tennis_yolo
+
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: player
+  1: tennis_ball
+  2: racket
