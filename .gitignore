@@ -1,1 +1,52 @@
-yolov8x.pt
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Model weights and larg files
+*.pt
+*.pth
+*.onnx
+*.weights
+*.h5
+*.zip
+
+# Data directories
+dataset/
+training/data/
+training/dataset/
+training/tennis_yolo/
+training/tennis_yolo2/
+training/tennis_yolo3/
+training/tennis_yolo_final/
+training/tennis_yolo_final2/
+training/tennis_yolo_final3/
+training/tennis_yolo_final4/
+training/debug_yolo/
+training/runs/
+runs/
+
+
+# Input/Output
+input_videos/
+output_videos/
