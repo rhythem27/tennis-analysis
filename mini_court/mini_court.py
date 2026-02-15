@@ -1,7 +1,8 @@
 import cv2
 import sys
+import os
 import numpy as np
-sys.path.append('../')
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import constants
 from utils import (convert_pixel_distance_to_meters, convert_meters_to_pixel_distance)
 
@@ -22,20 +23,6 @@ class MiniCourt():
 
     def set_court_drawing_key_points(self):
         drawing_key_points = [0]*28
-
-    def set_court_lines(self):
-        self.lines = [
-            (0,2),
-            (4, 5),
-            (6, 7),
-            (1, 3),
-
-            (0, 1),
-            (8, 9),
-            (10, 11),
-            (10, 11),
-            (2, 3)
-        ]
 
         # point 0 
         drawing_key_points[0] , drawing_key_points[1] = int(self.court_start_x), int(self.court_start_y)
@@ -67,6 +54,22 @@ class MiniCourt():
         drawing_key_points[26] , drawing_key_points[27] = int(self.court_end_x), int(self.court_start_y + self.convert_meters_pixels(constants.HALF_COURT_LINE_HEIGHT*5))
 
         self.drawing_key_points = drawing_key_points
+
+    def set_court_lines(self):
+        self.lines = [
+            (0,2),
+            (4, 5),
+            (6, 7),
+            (1, 3),
+
+            (0, 1),
+            (8, 9),
+            (10, 11),
+            (10, 11),
+            (2, 3)
+        ]
+
+
         
 
     def set_mini_court_position(self):
@@ -92,7 +95,34 @@ class MiniCourt():
         out = frame.copy()
         alpha = 0.5
         masks = shapes.astype(bool)
-        out[masks] = cv2.addWeighted(frame[masks], alpha, shapes[masks], 1 - alpha, 0)[masks]
-        out = cv2.cvtColor(out, cv2.COLOR_BGR2RGB)
+        out[masks] = cv2.addWeighted(frame[masks], alpha, shapes[masks], 1 - alpha, 0).squeeze()
         return out
+
+    def draw_mini_court(self, frames):
+        output_frames = []
+        for frame in frames:
+            frame = self.draw_background_rectangle(frame)
+            output_frames.append(frame)
+        return output_frames
+
+if __name__ == "__main__":
+    print("Starting MiniCourt test...")
+    from utils import read_video, save_video
+    
+    current_dir = os.path.dirname(__file__)
+    input_video_path = os.path.join(current_dir, '../input_videos/input_video.mp4')
+    output_video_path = os.path.join(current_dir, '../output_videos/output_mini_court.avi')
+
+    print(f"Reading video from {input_video_path}")
+    video_frames = read_video(input_video_path)
+    
+    print("Initializing MiniCourt...")
+    mini_court = MiniCourt(video_frames[0])
+    
+    print("Drawing MiniCourt...")
+    output_video_frames = mini_court.draw_mini_court(video_frames)
+    
+    print(f"Saving video to {output_video_path}")
+    save_video(output_video_frames, output_video_path)
+    print("Done.")
         
