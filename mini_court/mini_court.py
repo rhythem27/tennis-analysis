@@ -87,7 +87,26 @@ class MiniCourt():
         self.end_y = self.drawing_rectange_height + self.buffer
         self.start_x = self.end_x - self.drawing_rectange_width
         self.start_y = self.end_y - self.drawing_rectange_height
-        
+
+    def draw_court(self, frame):
+        for i in range(0, len(self.drawing_key_points), 2):
+            x = int(self.drawing_key_points[i])
+            y = int(self.drawing_key_points[i+1])
+            cv2.circle(frame, (x, y), 5, (0, 0, 255), -1)
+
+        # draw lines
+        for line in self.lines:
+            start_point = (int(self.drawing_key_points[line[0]*2]), int(self.drawing_key_points[line[0]*2+1]))
+            end_point = (int(self.drawing_key_points[line[1]*2]), int(self.drawing_key_points[line[1]*2+1]))
+            cv2.line(frame, start_point, end_point, (0, 0, 255), 2)
+
+        # draw net
+        net_start_point = (self.drawing_key_points[0], int((self.drawing_key_points[1] + self.drawing_key_points[5])/2)) 
+        net_end_point = (self.drawing_key_points[2], int((self.drawing_key_points[1] + self.drawing_key_points[5])/2))
+        cv2.line(frame, net_start_point, net_end_point, (0, 0, 255), 2)
+
+        return frame
+
     def draw_background_rectangle(self, frame):
         shapes = np.zeros_like(frame, np.uint8)
         #draw rectangle
@@ -102,27 +121,13 @@ class MiniCourt():
         output_frames = []
         for frame in frames:
             frame = self.draw_background_rectangle(frame)
+            frame = self.draw_court(frame)
             output_frames.append(frame)
         return output_frames
 
-if __name__ == "__main__":
-    print("Starting MiniCourt test...")
-    from utils import read_video, save_video
-    
-    current_dir = os.path.dirname(__file__)
-    input_video_path = os.path.join(current_dir, '../input_videos/input_video.mp4')
-    output_video_path = os.path.join(current_dir, '../output_videos/output_mini_court.avi')
-
-    print(f"Reading video from {input_video_path}")
-    video_frames = read_video(input_video_path)
-    
-    print("Initializing MiniCourt...")
-    mini_court = MiniCourt(video_frames[0])
-    
-    print("Drawing MiniCourt...")
-    output_video_frames = mini_court.draw_mini_court(video_frames)
-    
-    print(f"Saving video to {output_video_path}")
-    save_video(output_video_frames, output_video_path)
-    print("Done.")
-        
+    def get_start_point_of_mini_court(self):
+        return (self.court_start_x, self.court_start_y)
+    def width_of_mini_court(self):
+        return self.court_drawing_width
+    def get_court_drawing_keypoints(self):
+        return self.drawing_key_points

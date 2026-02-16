@@ -17,4 +17,5 @@ def save_video(output_video_frames, output_video_path):
     for frame in output_video_frames:
         out.write(frame)
     out.release()
-    print(f"Video saved to {output_video_path}")
+    import os
+    print(f"Video saved to {os.path.abspath(output_video_path)}")
