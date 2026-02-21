@@ -28,7 +28,7 @@ class BallTracker:
         # convert lists into pandas df 
         df_ball_position = pd.DataFrame(ball_positions, columns=["x1", "y1", "x2", "y2"])
         df_ball_position['ball_hit'] = 0
-        df_ball_position['mid_y'] = df_ball_position['y1'] + df_ball_position['y2'] / 2
+        df_ball_position['mid_y'] = (df_ball_position['y1'] + df_ball_position['y2']) / 2
         df_ball_position['mid_y_rolling_mean'] = df_ball_position['mid_y'].rolling(window=5, min_periods=1, center=False).mean()
         df_ball_position['delta_y'] = df_ball_position['mid_y_rolling_mean'].diff()
         minimum_change_frames_for_hit = 25
@@ -89,6 +89,7 @@ class BallTracker:
         for box in results.boxes:
             result = box.xyxy.tolist()[0]
             ball_dict[1] = result
+            break # Take only the first detection (highest confidence)
         return ball_dict
 
     def draw_bboxes(self,video_frames, ball_detection):

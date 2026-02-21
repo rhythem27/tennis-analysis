@@ -1,7 +1,8 @@
-from utils import (read_video, save_video, measure_distance, draw_player_stats, convert_meters_to_pixel_distance)
+from utils import (read_video, save_video, measure_distance, draw_player_stats, convert_meters_to_pixel_distance, convert_pixel_distance_to_meters)
 from trackers import PlayerTracker, BallTracker
 from court_line_detector import CourtLineDetector
 from mini_court import MiniCourt
+import constants
 import pandas as pd
 import cv2
 from copy import deepcopy
@@ -13,9 +14,9 @@ def main():
 
     # Track players and balls
     player_tracker = PlayerTracker("models/yolov8n.pt")
-    ball_tracker = BallTracker("models/yolov8n.pt")
+    ball_tracker = BallTracker("training/runs/detect/train2/weights/best.pt")
     player_detection = player_tracker.detect_frames(video_frames, read_from_stub=True, stub_path="tracker_stubs/player_detection.pkl")
-    ball_detection = ball_tracker.detect_frames(video_frames, read_from_stub=True, stub_path="tracker_stubs/ball_detection.pkl")
+    ball_detection = ball_tracker.detect_frames(video_frames, read_from_stub=True, stub_path="tracker_stubs/ball_detection_fixed.pkl")
 
     ball_detection = ball_tracker.interpolate_ball_positions(ball_detection)
 
@@ -59,7 +60,7 @@ def main():
 
         # get distance covered by ball
         distance_covered_by_ball_pixels = measure_distance(ball_mini_court_detection[start_frame][1], ball_mini_court_detection[end_frame][1])
-        distance_covered_by_ball_meters = convert_pixel_distance_to_meters(distance_covered_by_ball_pixels, constants.DOUBLE_LINE_WIDTH, mini_court.get_width_of_mini_court())
+        distance_covered_by_ball_meters = convert_pixel_distance_to_meters(distance_covered_by_ball_pixels, constants.DOUBLE_LINE_WIDTH, mini_court.width_of_mini_court())
 
         # speed of ball in km/h
         speed_of_ball_shot = distance_covered_by_ball_meters / ball_shot_time_in_sec * 3.6
@@ -73,7 +74,7 @@ def main():
         opponent_player_id = 1 if player_shot_ball == 2 else 2
         distance_covered_by_opponent_pixels = measure_distance(player_mini_court_detection[start_frame][opponent_player_id],
                                                                player_mini_court_detection[end_frame][opponent_player_id])
-        distance_covered_by_opponent_meters = convert_meters_to_pixel_distance(distance_covered_by_opponent_pixels, constants.DOUBLE_LINE_WIDTH, mini_court.get_width_of_mini_court())
+        distance_covered_by_opponent_meters = convert_pixel_distance_to_meters(distance_covered_by_opponent_pixels, constants.DOUBLE_LINE_WIDTH, mini_court.width_of_mini_court())
 
         speed_of_opponent = distance_covered_by_opponent_meters / ball_shot_time_in_sec * 3.6
 
